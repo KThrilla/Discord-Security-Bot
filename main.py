@@ -8,7 +8,7 @@ client = discord.Client()
 
 urlApiLink = 'https://www.virustotal.com/vtapi/v2/url/report'
 fileApiLink = 'https://www.virustotal.com/vtapi/v2/file/report'
-apiKey = 'e5daa1188d0c55c15b8a2c85af79194b4beff84e1435e42256eab79d937f0668'
+apiKey = 'apiKey'
 
 @client.event
 async def on_ready():
