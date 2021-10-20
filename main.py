@@ -37,7 +37,7 @@ async def on_message(message):
     await message.channel.send("CAUTION: " + str(response_json["positives"]) + " out of " + str(response_json["total"]) + " vendors flagged this URL as malicious: " + str(positiveEngineList))
     
   if(response_json["positives"] <= 0):
-    await message.channel.send("Safe: " + str(response_json["positives"]) + " out of " + str(response_json["total"]) + " vendors flagged this URL as malicious")
+    await message.channel.send("Safe URL")
     
   return
 
