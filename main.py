@@ -3,6 +3,7 @@ import os
 import requests
 import json
 import re
+from keep_alive import keep_alive
 
 client = discord.Client()
 
@@ -65,5 +66,6 @@ async def on_message(message):
   except:
     print("couldn't process: " + str(foundfile))
     pass
-    
+
+keep_alive()
 client.run(os.environ['BotToken'])
