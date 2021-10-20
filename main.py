@@ -8,7 +8,6 @@ client = discord.Client()
 
 urlApiLink = 'https://www.virustotal.com/vtapi/v2/url/report'
 fileApiLink = 'https://www.virustotal.com/vtapi/v2/file/report'
-apiKey = 'apiKey'
 
 @client.event
 async def on_ready():
@@ -24,7 +23,7 @@ async def on_message(message):
   #Scans Link through VirusTotal API; Returns any detected positive results and prints to console
   foundLink = re.search("(?P<url>https?://[^\s]+)", message.content).group("url")
     
-  params = {'apikey': apiKey, 'resource': foundLink}
+  params = {'apikey': os.environ['Key'], 'resource': foundLink}
   response = requests.get(urlApiLink, params=params)
   response_json = json.loads(response.content)
   positiveEngineList = []
@@ -47,7 +46,7 @@ async def on_message(message):
   try: #Scans file through VirusTotal API; Returns any detected positive results and prints to console
     foundfile = re.search("(?P<url>https?://[^\s]+)", message.content).group("url")
     
-    params = {'apikey': apiKey, 'resource': foundfile}
+    params = {'apikey': os.environ['Key'], 'resource': foundfile}
     response = requests.get(fileApiLink, params=params)
     response_json = json.loads(response.content)
     positiveEngineList = []
