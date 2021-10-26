@@ -9,6 +9,27 @@ client = discord.Client()
 
 urlApiLink = 'https://www.virustotal.com/vtapi/v2/url/report'
 
+def linkFound(message):
+  container = message.rsplit(" ")
+
+  for word in container:
+    if word.startswith("http") or word.startswith("www"):
+      return True
+  
+  return False
+
+
+def linkString(message):
+  container = message.rsplit(" ")
+
+  for word in container:
+    if word.startswith("http") :
+      wordList = word.split("/")
+      return wordList[2]
+    elif word.startswith("www"):
+      wordList = word.split("/")
+      return wordList[0]
+
 @client.event
 async def on_ready():
   print('We have logged in as {0.user}'.format(client))
@@ -21,46 +42,29 @@ async def on_message(message):
   
   ############################URLs###################################
   #Scans Link through VirusTotal API; Returns any detected positive results and prints to console
-  try:
-    foundLink = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\), ]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', message.content)
-    
-    params = {'apikey': os.environ['Key'], 'resource': foundLink}
-    response = requests.get(urlApiLink, params=params)
-    response_json = json.loads(response.content)
-    positiveEngineList = []
+  if(linkFound(message.content)):
+    try:
+      link = linkString(message.content)
+      
+      params = {'apikey': os.environ['Key'], 'resource': link}
+      response = requests.get(urlApiLink, params=params)
+      response_json = json.loads(response.content)
+      positiveEngineList = []
 
-    print("here1")
-    print(response_json)
+      for i in response_json["scans"]:
+          if(response_json["scans"][i]["detected"] == True):
+            positiveEngineList.append(i)
 
-    for i in response_json["scans"]:
-        if(response_json["scans"][i]["detected"] == True):
-          positiveEngineList.append(i)
+      if(response_json["positives"] > 0):
+        await message.channel.send("CAUTION: " + str(response_json["positives"]) + " out of " + str(response_json["total"]) + " vendors flagged this URL as malicious: " + str(positiveEngineList))
 
-    if(response_json["positives"] > 0):
-      await message.channel.send("CAUTION: " + str(response_json["positives"]) + " out of " + str(response_json["total"]) + " vendors flagged this URL as malicious: " + str(positiveEngineList))
+      if(response_json["positives"] <= 0):
+        await message.channel.send("Safe URL")
+      
+      return
 
-    if(response_json["positives"] <= 0):
-      await message.channel.send("Safe URL")
-    
-    return
-
-  except:
-    splitLink = foundLink[0].split('/', 3)
-    
-    params = {'apikey': os.environ['Key'], 'resource': splitLink[2]}
-    response = requests.get(urlApiLink, params=params)
-    response_json = json.loads(response.content)
-    positiveEngineList = []
-
-    for i in response_json["scans"]:
-        if(response_json["scans"][i]["detected"] == True):
-          positiveEngineList.append(i)
-
-    if(response_json["positives"] > 0):
-      await message.channel.send("Searched for '" + splitLink[2] + "'  instead -> " + "CAUTION: " + str(response_json["positives"]) + " out of " + str(response_json["total"]) + " vendors flagged this Website as malicious: " + str(positiveEngineList))
-
-    if(response_json["positives"] <= 0):
-      await message.channel.send("Searched for '" + splitLink[2] + "'  instead -> " + "Safe Website")
+    except:
+      pass
 
 keep_alive()
 client.run(os.environ['BotToken'])
