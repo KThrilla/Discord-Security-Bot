@@ -9,6 +9,7 @@ client = discord.Client()
 urlApiLink = 'https://www.virustotal.com/vtapi/v2/url/report'
 channelBanList = []
 
+# linkFound returns TRUE if a link is in the message; else FALSE
 def linkFound(message):
   container = message.rsplit(" ")
 
@@ -18,7 +19,7 @@ def linkFound(message):
   
   return False
 
-
+# linkString cuts the link down to a readable version for VirusTotal
 def linkString(message):
   container = message.rsplit(" ")
 
@@ -40,6 +41,7 @@ async def on_message(message):
   if message.author == client.user:
     return
   
+  ################### Bot Switch For Channels #########################
   if(message.content.startswith("$stop")):
     if message.channel.name not in channelBanList:
       await message.channel.send("Stopping scans in " + message.channel.name)
@@ -54,8 +56,8 @@ async def on_message(message):
     return
 
 
-  ############################URLs###################################
-  #Scans Link through VirusTotal API; Returns any detected positive results and prints to console
+  ############################ URL Scans ###################################
+  #Scans Link through VirusTotal; Returns any detected positive results and prints to console
   if(linkFound(message.content)):
     try:
       link = linkString(message.content)
