@@ -2,12 +2,12 @@ import discord
 import os
 import requests
 import json
-import re
 from keep_alive import keep_alive
 
 client = discord.Client()
 
 urlApiLink = 'https://www.virustotal.com/vtapi/v2/url/report'
+channelBanList = []
 
 def linkFound(message):
   container = message.rsplit(" ")
@@ -40,6 +40,20 @@ async def on_message(message):
   if message.author == client.user:
     return
   
+  if(message.content.startswith("$stop")):
+    if message.channel.name not in channelBanList:
+      await message.channel.send("Stopping scans in " + message.channel.name)
+      channelBanList.append(message.channel.name)
+    
+  elif message.content.startswith("$run"):
+    if message.channel.name in channelBanList:
+      await message.channel.send("Running scans in " + message.channel.name)
+      channelBanList.remove(message.channel.name)
+
+  if(message.channel.name in channelBanList):
+    return
+
+
   ############################URLs###################################
   #Scans Link through VirusTotal API; Returns any detected positive results and prints to console
   if(linkFound(message.content)):
